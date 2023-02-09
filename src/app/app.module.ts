@@ -7,9 +7,10 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { CanvasComponent } from './canvas/canvas.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, CanvasComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
