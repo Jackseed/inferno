@@ -116,7 +116,7 @@ function dash() {
 
 // Opérateurs de vecteurs
 
-function addVectors(v1: Object, v2) {
+function addVectors(v1: number{}, v2: Object) {
   const sum = {
     x: v1.x + v2.x,
     y: v1.y + v2.y,
