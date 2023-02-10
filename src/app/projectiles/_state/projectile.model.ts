@@ -1,7 +1,4 @@
-export interface Vector {
-  x: number;
-  y: number;
-}
+import { Vector } from "src/app/utils";
 
 export interface Projectile {
   id: string;
@@ -13,7 +10,6 @@ export interface Projectile {
 }
 
 export function createProjectile(
-  id: string,
   position: Vector,
   velocity: Vector,
   color: string,
