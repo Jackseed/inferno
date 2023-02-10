@@ -7,20 +7,18 @@ import {
   setFirestoreDoc,
   updateFirestoreDoc,
 } from 'src/app/utils';
+// States
 import { createPlayer, Player } from './player.model';
 import { Vector } from 'src/app/utils';
 
-// States
-
-import { PlayerStore } from './player.store';
-
 @Injectable({ providedIn: 'root' })
 export class PlayerService {
-  constructor(private db: Firestore, private store: PlayerStore) {}
+  constructor(private db: Firestore) {}
 
-  public async setplayer(id: string): Promise<Player> {
-    const player = createPlayer(id);
-    setFirestoreDoc(this.db, `players/${id}`, player);
+  public async setplayer(): Promise<Player> {
+    const player = createPlayer('blue');
+
+    setFirestoreDoc(this.db, `players/${player.id}`, player);
     return player;
   }
 

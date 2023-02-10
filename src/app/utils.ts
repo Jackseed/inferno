@@ -39,6 +39,12 @@ export function syncCollection<T>(
       if (change.type === 'added') {
         store.add(updatedDoc);
       }
+      if (change.type === 'modified') {
+        store.update(updatedDoc['id'], updatedDoc);
+      }
+      if (change.type === 'removed') {
+        store.remove(updatedDoc['id']);
+      }
     });
   });
 }
