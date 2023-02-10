@@ -9,9 +9,13 @@ export interface Player {
   //TODO -> add state, player controller, sprite source
 }
 
-export function createPlayer(color: string, params?: Partial<Player>): Player {
+export function createPlayer(
+  id: string,
+  color: string,
+  params?: Partial<Player>
+): Player {
   return {
-    id: (Math.random() * 1000).toString().concat(Date.now().toString()),
+    id,
     position: { x: 150, y: 150 },
     velocity: 5,
     color,

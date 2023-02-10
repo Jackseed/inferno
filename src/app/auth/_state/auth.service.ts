@@ -11,13 +11,15 @@ import {
   setFirestoreDoc,
   updateFirestoreDoc,
 } from 'src/app/utils';
+import { PlayerService } from 'src/app/players/_state';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   constructor(
     private router: Router,
     private db: Firestore,
-    private auth: Auth
+    private auth: Auth,
+    private playerService: PlayerService
   ) {}
 
   async anonymousLogin() {
@@ -25,6 +27,8 @@ export class AuthService {
 
     if (user) {
       this.setUser(user.uid);
+      this.playerService.setplayer(user.uid);
+      this.playerService.setActive(user.uid);
     }
     this.router.navigate(['']);
   }

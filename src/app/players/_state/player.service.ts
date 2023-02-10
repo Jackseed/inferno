@@ -1,7 +1,7 @@
 // Angular
 import { Injectable } from '@angular/core';
 // Firebase
-import { Firestore } from 'firebase/firestore';
+import { Firestore } from '@angular/fire/firestore';
 import {
   deleteFirestoreDoc,
   setFirestoreDoc,
@@ -10,13 +10,14 @@ import {
 // States
 import { createPlayer, Player } from './player.model';
 import { Vector } from 'src/app/utils';
+import { PlayerStore } from './player.store';
 
 @Injectable({ providedIn: 'root' })
 export class PlayerService {
-  constructor(private db: Firestore) {}
+  constructor(private db: Firestore, private store: PlayerStore) {}
 
-  public async setplayer(): Promise<Player> {
-    const player = createPlayer('blue');
+  public async setplayer(id: string): Promise<Player> {
+    const player = createPlayer(id, 'blue');
 
     setFirestoreDoc(this.db, `players/${player.id}`, player);
     return player;
@@ -28,6 +29,10 @@ export class PlayerService {
 
   public async deletePlayer(id: string) {
     deleteFirestoreDoc(this.db, `players/${id}`);
+  }
+
+  public setActive(id: string) {
+    this.store.setActive(id);
   }
 
   public movePlayer(

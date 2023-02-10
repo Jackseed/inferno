@@ -1,4 +1,3 @@
-
 import {
   Component,
   OnInit,
@@ -9,8 +8,8 @@ import {
 
 import { Firestore } from '@angular/fire/firestore';
 import { AuthStore } from '../auth/_state';
+import { PlayerStore } from '../players/_state';
 import { syncCollection } from '../utils';
-
 
 @Component({
   selector: 'app-canvas',
@@ -75,12 +74,16 @@ export class CanvasComponent implements AfterViewInit, OnInit {
 
   public aimPoint = this.aim0;
 
+  constructor(
+    private db: Firestore,
+    private authStore: AuthStore,
+    private playerStore: PlayerStore
+  ) {}
 
-
-constructor(private db: Firestore, private authStore: AuthStore) {}
-
- ngOnInit(): void {
-    syncCollection(this.db, 'users', this.authStore);}
+  ngOnInit(): void {
+    syncCollection(this.db, 'users', this.authStore);
+    syncCollection(this.db, 'players', this.playerStore);
+  }
 
   ngAfterViewInit(): void {
     this.ctx = this.gameArea!.nativeElement.getContext('2d')!;
@@ -208,9 +211,9 @@ constructor(private db: Firestore, private authStore: AuthStore) {}
         }
         if (
           this.circlePressed &&
-          this.cooldowns.dash.frame >= this.cooldowns.dash.cd*60
+          this.cooldowns.dash.frame >= this.cooldowns.dash.cd * 60
         ) {
-          console.log(this.cooldowns.dash.frame)
+          console.log(this.cooldowns.dash.frame);
           this.cooldowns.dash.frame = 0;
           this.dashing = true;
         }
@@ -303,5 +306,4 @@ constructor(private db: Firestore, private authStore: AuthStore) {}
     this.movePlayer();
     this.cooldowns.dash.frame += 1;
   }
-
 }
