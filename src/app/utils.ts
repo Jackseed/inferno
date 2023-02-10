@@ -1,6 +1,14 @@
 import { Firestore } from '@angular/fire/firestore';
 import { EntityStore } from '@datorama/akita';
-import { query, collection, onSnapshot } from 'firebase/firestore';
+import {
+  query,
+  collection,
+  onSnapshot,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+} from 'firebase/firestore';
 
 export interface Vector {
   x: number;
@@ -33,4 +41,36 @@ export function syncCollection<T>(
       }
     });
   });
+}
+
+export async function setFirestoreDoc(
+  db: Firestore,
+  docPath: string,
+  object: any
+): Promise<void> {
+  const document = doc(db, docPath);
+  await setDoc(document, object).catch((err) =>
+    console.log('Error on setting firestore doc: ', err)
+  );
+}
+
+export async function updateFirestoreDoc(
+  db: Firestore,
+  docPath: string,
+  updatedValues: any
+): Promise<void> {
+  const document = doc(db, docPath);
+  await updateDoc(document, updatedValues).catch((err) =>
+    console.log('Error on updating firestore doc: ', err)
+  );
+}
+
+export async function deleteFirestoreDoc(
+  db: Firestore,
+  docPath: string
+): Promise<void> {
+  const document = doc(db, docPath);
+  await deleteDoc(document).catch((err) =>
+    console.log('Error on updating firestore doc: ', err)
+  );
 }
