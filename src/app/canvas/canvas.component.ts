@@ -1,3 +1,4 @@
+
 import {
   Component,
   OnInit,
@@ -5,6 +6,11 @@ import {
   ElementRef,
   AfterViewInit,
 } from '@angular/core';
+
+import { Firestore } from '@angular/fire/firestore';
+import { AuthStore } from '../auth/_state';
+import { syncCollection } from '../utils';
+
 
 @Component({
   selector: 'app-canvas',
@@ -69,8 +75,13 @@ export class CanvasComponent implements AfterViewInit {
 
   public aimPoint = this.aim0;
 
-  constructor() {}
 
+ 
+constructor(private db: Firestore, private authStore: AuthStore) {}
+
+ ngOnInit(): void {
+    syncCollection(this.db, 'users', this.authStore);}
+    
   ngAfterViewInit(): void {
     this.ctx = this.gameArea!.nativeElement.getContext('2d')!;
     console.log(this.ctx);
@@ -292,4 +303,5 @@ export class CanvasComponent implements AfterViewInit {
     this.movePlayer();
     this.cooldowns.dash.frame += 1;
   }
+
 }
