@@ -21,9 +21,9 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    /* canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
 
-    data: { authGuardPipe: redirectLoggedInToHome }, */
+    data: { authGuardPipe: redirectLoggedInToHome },
   },
 ];
 
