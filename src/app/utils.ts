@@ -8,6 +8,7 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  Unsubscribe,
 } from 'firebase/firestore';
 
 export interface Vector {
@@ -30,10 +31,10 @@ export function syncCollection<T>(
   db: Firestore,
   collectionName: string,
   store: EntityStore<any, any>
-) {
+): Unsubscribe {
   const q = query(collection(db, collectionName));
   //const unsubscribe =
-  onSnapshot(q, (snapshot) => {
+  return onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       const updatedDoc = change.doc.data();
       if (change.type === 'added') {

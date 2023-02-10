@@ -3,6 +3,7 @@ import { Vector } from 'src/app/utils';
 export interface Player {
   id: string;
   position: Vector;
+  direction: Vector;
   velocity: number;
   color: string;
 
@@ -17,6 +18,7 @@ export function createPlayer(
   return {
     id,
     position: { x: 150, y: 150 },
+    direction: { x: 0, y: 1 },
     velocity: 5,
     color,
   };

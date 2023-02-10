@@ -1,23 +1,32 @@
+// Angular
 import {
   Component,
   OnInit,
   ViewChild,
   ElementRef,
   AfterViewInit,
+  OnDestroy,
 } from '@angular/core';
-
-import { Firestore } from '@angular/fire/firestore';
-import { AuthStore } from '../auth/_state';
-import { PlayerStore } from '../players/_state';
+// AngularFire
+import { Firestore, Unsubscribe } from '@angular/fire/firestore';
+// States
+import { PlayerStore, PlayerQuery, PlayerService } from '../players/_state';
 import { syncCollection } from '../utils';
+import { AuthStore } from '../auth/_state';
+import { BlockStore } from 'src/app/blocks/_state';
+import { ProjectileStore } from 'src/app/projectiles/_state';
 
 @Component({
   selector: 'app-canvas',
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.scss'],
 })
-export class CanvasComponent implements AfterViewInit, OnInit {
+export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('gameArea') gameArea: ElementRef | undefined;
+  private authSyncSub: Unsubscribe;
+  private playerSyncSub: Unsubscribe;
+  private blockSyncSub: Unsubscribe;
+  private projectileSyncSub: Unsubscribe;
 
   private ctx: CanvasRenderingContext2D | undefined;
 
@@ -77,17 +86,26 @@ export class CanvasComponent implements AfterViewInit, OnInit {
   constructor(
     private db: Firestore,
     private authStore: AuthStore,
-    private playerStore: PlayerStore
+    private playerStore: PlayerStore,
+    private playerQuery: PlayerQuery,
+    private playerService: PlayerService,
+    private blockStore: BlockStore,
+    private projectileStore: ProjectileStore
   ) {}
 
   ngOnInit(): void {
-    syncCollection(this.db, 'users', this.authStore);
-    syncCollection(this.db, 'players', this.playerStore);
+    this.authSyncSub = syncCollection(this.db, 'users', this.authStore);
+    this.playerSyncSub = syncCollection(this.db, 'players', this.playerStore);
+    this.blockSyncSub = syncCollection(this.db, 'blocks', this.blockStore);
+    this.projectileSyncSub = syncCollection(
+      this.db,
+      'projectiles',
+      this.projectileStore
+    );
   }
 
   ngAfterViewInit(): void {
     this.ctx = this.gameArea!.nativeElement.getContext('2d')!;
-    console.log(this.ctx);
 
     this.gameLoop();
     this.drawPlayer();
@@ -153,122 +171,59 @@ export class CanvasComponent implements AfterViewInit, OnInit {
   }
 
   private controllerInput() {
-    if (this.controllerIndex !== null) {
-      const gamepad = navigator.getGamepads()[this.controllerIndex];
-      if (gamepad !== null) {
-        const buttons = gamepad.buttons;
-        this.upPressed = buttons[12].pressed;
-        this.downPressed = buttons[13].pressed;
-        this.leftPressed = buttons[14].pressed;
-        this.rightPressed = buttons[15].pressed;
+    if (this.controllerIndex === null) return null;
+    const gamepad = navigator.getGamepads()[this.controllerIndex];
+    if (gamepad === null) return null;
+    let newDirection = this.direction;
+    const buttons = gamepad.buttons;
+    this.upPressed = buttons[12].pressed;
+    this.downPressed = buttons[13].pressed;
+    this.leftPressed = buttons[14].pressed;
+    this.rightPressed = buttons[15].pressed;
 
-        this.crossPressed = buttons[0].pressed;
-        this.trianglePressed = buttons[3].pressed;
-        this.squarePressed = buttons[2].pressed;
-        this.circlePressed = buttons[1].pressed;
+    this.crossPressed = buttons[0].pressed;
+    this.trianglePressed = buttons[3].pressed;
+    this.squarePressed = buttons[2].pressed;
+    this.circlePressed = buttons[1].pressed;
 
-        const stickDeadZone = 0.4;
-        const leftAndRightValue = gamepad.axes[0];
-        const upAndDownValue = gamepad.axes[1];
+    const stickDeadZone = 0.4;
+    const leftAndRightValue = gamepad.axes[0];
+    const upAndDownValue = gamepad.axes[1];
 
-        if (leftAndRightValue >= stickDeadZone) {
-          this.rightPressed = true;
-        }
-        if (leftAndRightValue <= -stickDeadZone) {
-          this.leftPressed = true;
-        }
-        if (upAndDownValue >= stickDeadZone) {
-          this.downPressed = true;
-        }
-        if (upAndDownValue <= -stickDeadZone) {
-          this.upPressed = true;
-        }
-
-        if (Math.abs(upAndDownValue * leftAndRightValue) <= 0.5) {
-          this.velocity = 5;
-        } else this.velocity = (Math.sqrt(2) * 5) / 2;
-
-        if (
-          this.leftPressed ||
-          this.rightPressed ||
-          this.upPressed ||
-          this.downPressed
-        ) {
-          this.direction = {
-            x:
-              leftAndRightValue /
-              Math.sqrt(
-                Math.pow(leftAndRightValue, 2) + Math.pow(upAndDownValue, 2)
-              ),
-            y:
-              upAndDownValue /
-              Math.sqrt(
-                Math.pow(leftAndRightValue, 2) + Math.pow(upAndDownValue, 2)
-              ),
-          };
-        }
-        if (this.crossPressed) {
-        }
-        if (
-          this.circlePressed &&
-          this.cooldowns.dash.frame >= this.cooldowns.dash.cd * 60
-        ) {
-          console.log(this.cooldowns.dash.frame);
-          this.cooldowns.dash.frame = 0;
-          this.dashing = true;
-        }
-
-        if (this.squarePressed) {
-          this.canMove = false;
-          if (this.isAiming === false) {
-            this.aimPoint = {
-              x:
-                this.playerX +
-                this.direction.x * (this.playerWidthAndHeight + 10),
-              y:
-                this.playerY +
-                this.direction.y * (this.playerWidthAndHeight + 10),
-            };
-            this.aimRange = 0;
-            this.isAiming = true;
-          }
-          console.log('squarePressed');
-
-          // aimingLine();
-        } else {
-          this.canMove = true;
-          //  shoot();
-          this.isAiming = false;
-        }
-
-        if (this.trianglePressed) {
-          this.velocity = 1;
-          this.shieldUp = true;
-          this.shieldLength = 80;
-        } else {
-          this.velocity = 5;
-          this.shieldUp = false;
-          this.shieldLength = 60;
-        }
-      }
+    if (leftAndRightValue >= stickDeadZone) {
+      this.rightPressed = true;
     }
-  }
+    if (leftAndRightValue <= -stickDeadZone) {
+      this.leftPressed = true;
+    }
+    if (upAndDownValue >= stickDeadZone) {
+      this.downPressed = true;
+    }
+    if (upAndDownValue <= -stickDeadZone) {
+      this.upPressed = true;
+    }
 
-  private movePlayer() {
     if (
-      this.canMove &&
-      (this.upPressed ||
-        this.downPressed ||
-        this.rightPressed ||
-        this.leftPressed)
+      this.leftPressed ||
+      this.rightPressed ||
+      this.upPressed ||
+      this.downPressed
     ) {
-      this.playerX += this.direction.x * this.velocity;
-      this.playerY += this.direction.y * this.velocity;
+      newDirection = {
+        x:
+          leftAndRightValue /
+          Math.sqrt(
+            Math.pow(leftAndRightValue, 2) + Math.pow(upAndDownValue, 2)
+          ),
+        y:
+          upAndDownValue /
+          Math.sqrt(
+            Math.pow(leftAndRightValue, 2) + Math.pow(upAndDownValue, 2)
+          ),
+      };
+      return newDirection;
     }
-    if (this.dashing && this.cooldowns.dash.frame <= 5) {
-      this.playerX += this.direction.x * 30;
-      this.playerY += this.direction.y * 30;
-    }
+    return null;
   }
 
   private clearScreen() {
@@ -277,12 +232,14 @@ export class CanvasComponent implements AfterViewInit, OnInit {
   }
 
   private drawPlayer() {
+    const player = this.playerQuery.getActive();
+    if (!!!player) return;
     this.ctx.fillStyle = this.playerColor;
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.beginPath();
     this.ctx.arc(
-      this.playerX,
-      this.playerY,
+      player.position.x,
+      player.position.y,
       this.playerWidthAndHeight,
       0,
       Math.PI * 2
@@ -292,18 +249,33 @@ export class CanvasComponent implements AfterViewInit, OnInit {
     this.ctx.fillStyle = this.playerColor;
     this.ctx.fill();
     this.ctx.closePath();
-
-    console.log(this.playerX, this.playerY, this.playerWidthAndHeight);
   }
 
   private gameLoop() {
+    const activePlayer = this.playerQuery.getActive();
     this.clearScreen();
     requestAnimationFrame(this.gameLoop.bind(this));
 
-    this.controllerInput();
+    const newDirection = this.controllerInput();
     this.drawPlayer();
     this.drawShield();
-    this.movePlayer();
-    this.cooldowns.dash.frame += 1;
+    if (!!newDirection && !!activePlayer) {
+      const newPosition = this.playerService.movePlayer(
+        activePlayer.position,
+        activePlayer.direction,
+        activePlayer.velocity
+      );
+      this.playerService.updatePlayer(activePlayer.id, {
+        position: newPosition,
+        direction: newDirection,
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.authSyncSub();
+    this.playerSyncSub();
+    this.blockSyncSub();
+    this.projectileSyncSub();
   }
 }

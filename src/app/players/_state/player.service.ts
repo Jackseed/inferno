@@ -23,8 +23,11 @@ export class PlayerService {
     return player;
   }
 
-  public async updatePlayer(id: string, name: string) {
-    updateFirestoreDoc(this.db, `players/${id}`, { name });
+  public async updatePlayer(
+    id: string,
+    updatedValues: { position: Vector; direction: Vector }
+  ) {
+    updateFirestoreDoc(this.db, `players/${id}`, updatedValues);
   }
 
   public async deletePlayer(id: string) {
@@ -36,26 +39,15 @@ export class PlayerService {
   }
 
   public movePlayer(
-    canMove: boolean,
-    upPressed: boolean,
-    rightPressed: boolean,
-    leftPressed: boolean,
-    downPressed: boolean,
     position: Vector,
     direction: Vector,
     velocity: number
-  ) {
-    if (canMove && (upPressed || downPressed || rightPressed || leftPressed)) {
-      const newPosition = {
-        x: (position.x += direction.x * velocity),
-        y: (position.y += direction.y * velocity),
-      };
+  ): Vector {
+    const newPosition = {
+      x: direction.x * velocity + position.x,
+      y: position.y + direction.y * velocity,
+    };
 
-      return newPosition;
-    } else return position;
-    // if (dashing && cooldowns.dash.frame <= 5) {
-    //   position.x += direction.x * 30;
-    //   position.y += direction.y * 30;
-    // }
+    return newPosition;
   }
 }
