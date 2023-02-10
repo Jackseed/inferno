@@ -17,7 +17,7 @@ import { syncCollection } from '../utils';
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.scss'],
 })
-export class CanvasComponent implements AfterViewInit {
+export class CanvasComponent implements AfterViewInit, OnInit {
   @ViewChild('gameArea') gameArea: ElementRef | undefined;
 
   private ctx: CanvasRenderingContext2D | undefined;
@@ -76,12 +76,12 @@ export class CanvasComponent implements AfterViewInit {
   public aimPoint = this.aim0;
 
 
- 
+
 constructor(private db: Firestore, private authStore: AuthStore) {}
 
  ngOnInit(): void {
     syncCollection(this.db, 'users', this.authStore);}
-    
+
   ngAfterViewInit(): void {
     this.ctx = this.gameArea!.nativeElement.getContext('2d')!;
     console.log(this.ctx);
