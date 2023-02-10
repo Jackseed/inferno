@@ -1,13 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+} from '@angular/core';
 
 @Component({
   selector: 'app-canvas',
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.scss'],
 })
-export class CanvasComponent implements OnInit {
-  public canvas = <HTMLCanvasElement>document.getElementById('gameArea');
-  //public ctx = this.canvas!.getContext!('2d');
+export class CanvasComponent implements AfterViewInit {
+  @ViewChild('gameArea') gameArea: ElementRef | undefined;
+
+  private ctx: CanvasRenderingContext2D | undefined;
 
   public playerWidthAndHeight = 0;
   public playerX = 300;
@@ -62,20 +69,22 @@ export class CanvasComponent implements OnInit {
   };
 
   public aimPoint = this.aim0;
+
   constructor() {}
 
-  ngOnInit(): void {
-    // this.setupCanvas();
+  ngAfterViewInit(): void {
+    console.log(this.gameArea);
+    this.ctx = this.gameArea!.nativeElement.getContext('2d')!;
+
+    this.setupCanvas();
   }
 
-  /*   private setupCanvas() {
-    this.canvas.width = 1024;
-    this.canvas.height = 576;
+  private setupCanvas() {
 
     this.playerWidthAndHeight = 30;
     this.playerX = 300;
     this.playerY = 500;
     this.playerColor = 'orange';
     this.velocity = 0.01;
-  } */
+  }
 }
