@@ -2,20 +2,18 @@
 import { Injectable } from '@angular/core';
 // Firebase
 import { Firestore } from '@angular/fire/firestore';
-import { createId, setFirestoreDoc } from 'src/app/utils';
+import { addFirestoreDoc } from 'src/app/utils';
 // States
-import { GameStore } from './game.store';
-import { createGame, Game } from './game.model';
+import { GameStore, createGame } from '../_state';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
   constructor(private store: GameStore, private db: Firestore) {}
 
-  public async setGame(name: string): Promise<Game> {
-    const id = createId(this.db);
-    const game = createGame(id, name);
-    setFirestoreDoc(this.db, `games/${game.id}`, game);
-    return game;
+  public async addGame(name: string): Promise<string> {
+    const game = createGame(name);
+    const gameDoc = await addFirestoreDoc(this.db, 'games', game);
+    return gameDoc.id;
   }
 
   public setActive(id: string) {

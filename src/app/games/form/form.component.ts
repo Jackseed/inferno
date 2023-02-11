@@ -2,7 +2,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 // States
-import { Game, GameService } from '../_state';
+import { GameService } from '../_state';
 
 @Component({
   selector: 'app-form',
@@ -24,9 +24,9 @@ export class FormComponent implements OnInit {
   public async createGame() {
     if (!this.gameName) return;
     this.service
-      .setGame(this.gameName)
-      .then((game: Game) => {
-        this.router.navigate(['games', game.id]);
+      .addGame(this.gameName)
+      .then((id: string) => {
+        this.router.navigate(['games', id]);
       })
       .catch((error: any) => console.log('Game creation failed: ', error));
   }

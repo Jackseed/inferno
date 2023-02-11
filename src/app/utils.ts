@@ -1,4 +1,4 @@
-import { Firestore } from '@angular/fire/firestore';
+import { addDoc, Firestore } from '@angular/fire/firestore';
 import { EntityStore } from '@datorama/akita';
 import {
   query,
@@ -51,10 +51,6 @@ export function syncCollection<T>(
   });
 }
 
-export function createId(db: Firestore) {
-  const docRef = doc(db, 'games') as DocumentReference;
-  return docRef.id;
-}
 
 export async function setFirestoreDoc(
   db: Firestore,
@@ -65,6 +61,18 @@ export async function setFirestoreDoc(
   await setDoc(document, object).catch((err) =>
     console.log('Error on setting firestore doc: ', err)
   );
+}
+
+export async function addFirestoreDoc(
+  db: Firestore,
+  collectionPath: string,
+  object: any
+): Promise<DocumentReference> {
+  const collectionRef = collection(db, collectionPath);
+  const docRef = await addDoc(collectionRef, object).catch((err) =>
+    console.log('Error on adding firestore doc: ', err)
+  );
+  return docRef as DocumentReference;
 }
 
 export async function updateFirestoreDoc(
