@@ -13,6 +13,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { CanvasComponent } from './canvas/canvas.component';
 import { MenuComponent } from './games/menu/menu.component';
 import { FormComponent } from './games/form/form.component';
+import { ListComponent } from './games/list/list.component';
 
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 const redirectLoggedInToHome = () => redirectLoggedInTo(['']);
@@ -20,8 +21,20 @@ const redirectLoggedInToHome = () => redirectLoggedInTo(['']);
 const routes: Routes = [
   {
     path: '',
+    component: MenuComponent,
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin },
+  },
+  {
+    path: 'games/creation',
     component: FormComponent,
-    canActivate: [AuthGuard, ActiveGuard],
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin },
+  },
+  {
+    path: 'games/join',
+    component: ListComponent,
+    canActivate: [AuthGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin },
   },
   {
