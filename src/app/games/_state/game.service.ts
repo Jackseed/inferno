@@ -11,9 +11,9 @@ import { createGame, Game } from './game.model';
 export class GameService {
   constructor(private store: GameStore, private db: Firestore) {}
 
-  public async setGame(): Promise<Game> {
+  public async setGame(name: string): Promise<Game> {
     const id = createId(this.db);
-    const game = createGame(id);
+    const game = createGame(id, name);
     setFirestoreDoc(this.db, `games/${game.id}`, game);
     return game;
   }
