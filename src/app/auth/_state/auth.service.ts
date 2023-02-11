@@ -27,7 +27,7 @@ export class AuthService {
 
     if (user) {
       this.setUser(user.uid);
-      this.playerService.setplayer(user.uid);
+      this.playerService.setPlayer(user.uid);
       this.playerService.setActive(user.uid);
     }
     this.router.navigate(['']);

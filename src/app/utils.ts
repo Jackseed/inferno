@@ -9,6 +9,7 @@ import {
   updateDoc,
   deleteDoc,
   Unsubscribe,
+  DocumentReference,
 } from 'firebase/firestore';
 
 export interface Vector {
@@ -48,6 +49,11 @@ export function syncCollection<T>(
       }
     });
   });
+}
+
+export function createId(db: Firestore) {
+  const docRef = doc(db, 'games') as DocumentReference;
+  return docRef.id;
 }
 
 export async function setFirestoreDoc(
