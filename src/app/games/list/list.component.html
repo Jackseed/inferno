@@ -1,0 +1,3 @@
+<li *ngFor="let game of gameList$ | async">
+  <button (click)="joinGame(game.id)">{{ game.name }}</button>
+</li>

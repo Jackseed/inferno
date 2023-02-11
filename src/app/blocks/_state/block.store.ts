@@ -12,7 +12,7 @@ export interface BlockState
     ActiveState<string> {}
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'block' })
+@StoreConfig({ name: 'blocks' })
 export class BlockStore extends EntityStore<BlockState> {
   constructor() {
     super();

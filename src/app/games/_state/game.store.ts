@@ -5,15 +5,15 @@ import {
   StoreConfig,
   ActiveState,
 } from '@datorama/akita/src';
-import { Projectile } from './projectile.model';
+import { Game } from './game.model';
 
-export interface ProjectileState
-  extends EntityState<Projectile, string>,
+export interface GameState
+  extends EntityState<Game, string>,
     ActiveState<string> {}
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'projectiles' })
-export class ProjectileStore extends EntityStore<ProjectileState> {
+@StoreConfig({ name: 'games' })
+export class GameStore extends EntityStore<GameState> {
   constructor() {
     super();
   }

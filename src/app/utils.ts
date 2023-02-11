@@ -1,4 +1,4 @@
-import { Firestore } from '@angular/fire/firestore';
+import { addDoc, Firestore } from '@angular/fire/firestore';
 import { EntityStore } from '@datorama/akita';
 import {
   query,
@@ -9,6 +9,7 @@ import {
   updateDoc,
   deleteDoc,
   Unsubscribe,
+  DocumentReference,
 } from 'firebase/firestore';
 
 export interface Vector {
@@ -33,7 +34,6 @@ export function syncCollection<T>(
   store: EntityStore<any, any>
 ): Unsubscribe {
   const q = query(collection(db, collectionName));
-  //const unsubscribe =
   return onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       const updatedDoc = change.doc.data();
@@ -59,6 +59,18 @@ export async function setFirestoreDoc(
   await setDoc(document, object).catch((err) =>
     console.log('Error on setting firestore doc: ', err)
   );
+}
+
+export async function addFirestoreDoc(
+  db: Firestore,
+  collectionPath: string,
+  object: any
+): Promise<DocumentReference> {
+  const collectionRef = collection(db, collectionPath);
+  const docRef = await addDoc(collectionRef, object).catch((err) =>
+    console.log('Error on adding firestore doc: ', err)
+  );
+  return docRef as DocumentReference;
 }
 
 export async function updateFirestoreDoc(

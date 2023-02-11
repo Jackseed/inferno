@@ -12,7 +12,7 @@ export interface AuthState
     ActiveState<string> {}
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'auth' })
+@StoreConfig({ name: 'users' })
 export class AuthStore extends EntityStore<AuthState> {
   constructor() {
     super();
