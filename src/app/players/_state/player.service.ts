@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 // Firebase
 import { Firestore } from '@angular/fire/firestore';
+import { arrayUnion } from 'firebase/firestore';
 import {
   deleteFirestoreDoc,
   setFirestoreDoc,
@@ -11,27 +12,43 @@ import {
 import { createPlayer, Player } from './player.model';
 import { Vector } from 'src/app/utils';
 import { PlayerStore } from './player.store';
+import { GameService } from 'src/app/games/_state';
 
 @Injectable({ providedIn: 'root' })
 export class PlayerService {
-  constructor(private db: Firestore, private store: PlayerStore) {}
+  constructor(
+    private db: Firestore,
+    private store: PlayerStore,
+    private gameService: GameService
+  ) {}
 
-  public async setPlayer(gameId: string, id: string): Promise<Player> {
-    const player = createPlayer(id, 'blue');
+  public async setPlayer(gameId: string, playerId: string): Promise<Player> {
+    const player = createPlayer(playerId, 'blue');
 
     setFirestoreDoc(this.db, `games/${gameId}/players/${player.id}`, player);
     return player;
   }
 
-  public async updatePlayer(
-    id: string,
-    updatedValues: { position: Vector; direction: Vector }
-  ) {
-    updateFirestoreDoc(this.db, `players/${id}`, updatedValues);
+  public addPlayer(gameId: string, playerId: string) {
+    const playerIds = arrayUnion(playerId);
+    this.gameService.updateGame(gameId, playerIds);
+    this.setPlayer(gameId, playerId);
   }
 
-  public async deletePlayer(id: string) {
-    deleteFirestoreDoc(this.db, `players/${id}`);
+  public async updatePlayer(
+    gameId: string,
+    playerId: string,
+    updatedValues: { position: Vector; direction: Vector }
+  ) {
+    updateFirestoreDoc(
+      this.db,
+      `games/${gameId}/players/${playerId}`,
+      updatedValues
+    );
+  }
+
+  public async deletePlayer(playerId: string) {
+    deleteFirestoreDoc(this.db, `players/${playerId}`);
   }
 
   public setActive(id: string) {

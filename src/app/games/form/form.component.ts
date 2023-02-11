@@ -30,10 +30,10 @@ export class FormComponent implements OnInit {
 
   public async createGame() {
     if (!this.gameName) return;
+    const userId = this.authQuery.getActiveId();
     this.service
-      .addGame(this.gameName)
+      .addGame(this.gameName, userId)
       .then(async (gameId: string) => {
-        const userId = this.authQuery.getActiveId();
         await this.playerService.setPlayer(gameId, userId);
         this.router.navigate(['games', gameId]);
       })

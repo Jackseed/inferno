@@ -18,7 +18,7 @@ import { PlayerStore, PlayerQuery, PlayerService } from '../players/_state';
 import { AuthQuery } from '../auth/_state';
 import { BlockStore } from 'src/app/blocks/_state';
 import { ProjectileStore } from 'src/app/projectiles/_state';
-import { GameService } from '../games/_state';
+import { GameQuery, GameService } from '../games/_state';
 
 @Component({
   selector: 'app-canvas',
@@ -90,6 +90,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private db: Firestore,
     private authQuery: AuthQuery,
+    private gameQuery: GameQuery,
     private gameService: GameService,
     private playerStore: PlayerStore,
     private playerQuery: PlayerQuery,
@@ -127,7 +128,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     this.ctx = this.gameArea!.nativeElement.getContext('2d')!;
 
     this.gameLoop();
-    this.drawPlayer();
+    this.drawPlayers();
     this.drawShield();
 
     window.addEventListener('gamepadconnected', (event) => {
@@ -250,33 +251,36 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     this.ctx.fillRect(0, 0, 800, 450);
   }
 
-  private drawPlayer() {
-    const player = this.playerQuery.getActive();
-    if (!!!player) return;
-    this.ctx.fillStyle = this.playerColor;
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.beginPath();
-    this.ctx.arc(
-      player.position.x,
-      player.position.y,
-      this.playerWidthAndHeight,
-      0,
-      Math.PI * 2
-    );
-    this.ctx.strokeStyle = this.playerColor;
-    this.ctx.stroke();
-    this.ctx.fillStyle = this.playerColor;
-    this.ctx.fill();
-    this.ctx.closePath();
+  private drawPlayers() {
+    const players = this.playerQuery.getAll();
+    for (const player of players) {
+      if (!!!player) return;
+      this.ctx.fillStyle = this.playerColor;
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.ctx.beginPath();
+      this.ctx.arc(
+        player.position.x,
+        player.position.y,
+        this.playerWidthAndHeight,
+        0,
+        Math.PI * 2
+      );
+      this.ctx.strokeStyle = this.playerColor;
+      this.ctx.stroke();
+      this.ctx.fillStyle = this.playerColor;
+      this.ctx.fill();
+      this.ctx.closePath();
+    }
   }
 
   private gameLoop() {
     const activePlayer = this.playerQuery.getActive();
+    const gameId = this.gameQuery.getActiveId();
     this.clearScreen();
     requestAnimationFrame(this.gameLoop.bind(this));
 
     const newDirection = this.controllerInput();
-    this.drawPlayer();
+    this.drawPlayers();
     this.drawShield();
     if (!!newDirection && !!activePlayer) {
       const newPosition = this.playerService.movePlayer(
@@ -284,7 +288,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
         activePlayer.direction,
         activePlayer.velocity
       );
-      this.playerService.updatePlayer(activePlayer.id, {
+      this.playerService.updatePlayer(gameId, activePlayer.id, {
         position: newPosition,
         direction: newDirection,
       });
