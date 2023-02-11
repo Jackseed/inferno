@@ -13,6 +13,5 @@ export class ListComponent implements OnInit {
 
   ngOnInit(): void {
     this.gameList$ = this.query.selectAll();
-    this.gameList$.subscribe(console.log);
   }
 }

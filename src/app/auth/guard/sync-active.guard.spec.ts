@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ActiveGuard } from './sync-active.guard';
+import { SyncActiveGuard } from './sync-active.guard';
 
 describe('SyncActiveGuard', () => {
-  let guard: ActiveGuard;
+  let guard: SyncActiveGuard;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    guard = TestBed.inject(ActiveGuard);
+    guard = TestBed.inject(SyncActiveGuard);
   });
 
   it('should be created', () => {

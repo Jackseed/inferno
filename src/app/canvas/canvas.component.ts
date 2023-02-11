@@ -7,14 +7,18 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 // AngularFire
 import { Firestore, Unsubscribe } from '@angular/fire/firestore';
+import { syncCollection } from '../utils';
+// Rxjs
+import { takeWhile, tap } from 'rxjs/operators';
 // States
 import { PlayerStore, PlayerQuery, PlayerService } from '../players/_state';
-import { syncCollection } from '../utils';
-import { AuthStore } from '../auth/_state';
+import { AuthQuery } from '../auth/_state';
 import { BlockStore } from 'src/app/blocks/_state';
 import { ProjectileStore } from 'src/app/projectiles/_state';
+import { GameService } from '../games/_state';
 
 @Component({
   selector: 'app-canvas',
@@ -23,7 +27,6 @@ import { ProjectileStore } from 'src/app/projectiles/_state';
 })
 export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('gameArea') gameArea: ElementRef | undefined;
-  private authSyncSub: Unsubscribe;
   private playerSyncSub: Unsubscribe;
   private blockSyncSub: Unsubscribe;
   private projectileSyncSub: Unsubscribe;
@@ -84,8 +87,10 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   public aimPoint = this.aim0;
 
   constructor(
+    private activatedRoute: ActivatedRoute,
     private db: Firestore,
-    private authStore: AuthStore,
+    private authQuery: AuthQuery,
+    private gameService: GameService,
     private playerStore: PlayerStore,
     private playerQuery: PlayerQuery,
     private playerService: PlayerService,
@@ -94,8 +99,22 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.authSyncSub = syncCollection(this.db, 'users', this.authStore);
-    this.playerSyncSub = syncCollection(this.db, 'players', this.playerStore);
+    const gameId = this.activatedRoute.snapshot.paramMap.get('id');
+    this.gameService.setActive(gameId);
+    this.authQuery
+      .selectActiveId()
+      .pipe(
+        tap((id) => {
+          if (id) this.playerService.setActive(id);
+        }),
+        takeWhile((id) => !!!id)
+      )
+      .subscribe();
+    this.playerSyncSub = syncCollection(
+      this.db,
+      `games/${gameId}/players`,
+      this.playerStore
+    );
     this.blockSyncSub = syncCollection(this.db, 'blocks', this.blockStore);
     this.projectileSyncSub = syncCollection(
       this.db,
@@ -273,7 +292,6 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.authSyncSub();
     this.playerSyncSub();
     this.blockSyncSub();
     this.projectileSyncSub();

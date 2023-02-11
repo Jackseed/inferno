@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 // Firebase
 import { Firestore } from '@angular/fire/firestore';
-import { addFirestoreDoc } from 'src/app/utils';
+import { addFirestoreDoc, updateFirestoreDoc } from 'src/app/utils';
 // States
 import { GameStore, createGame } from '../_state';
 
@@ -12,8 +12,9 @@ export class GameService {
 
   public async addGame(name: string): Promise<string> {
     const game = createGame(name);
-    const gameDoc = await addFirestoreDoc(this.db, 'games', game);
-    return gameDoc.id;
+    const { id } = await addFirestoreDoc(this.db, 'games', game);
+    await updateFirestoreDoc(this.db, `games/${id}`, { id });
+    return id;
   }
 
   public setActive(id: string) {

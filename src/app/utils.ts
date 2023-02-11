@@ -34,7 +34,6 @@ export function syncCollection<T>(
   store: EntityStore<any, any>
 ): Unsubscribe {
   const q = query(collection(db, collectionName));
-  //const unsubscribe =
   return onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       const updatedDoc = change.doc.data();
@@ -50,7 +49,6 @@ export function syncCollection<T>(
     });
   });
 }
-
 
 export async function setFirestoreDoc(
   db: Firestore,

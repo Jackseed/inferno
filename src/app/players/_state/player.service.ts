@@ -16,10 +16,10 @@ import { PlayerStore } from './player.store';
 export class PlayerService {
   constructor(private db: Firestore, private store: PlayerStore) {}
 
-  public async setPlayer(id: string): Promise<Player> {
+  public async setPlayer(gameId: string, id: string): Promise<Player> {
     const player = createPlayer(id, 'blue');
 
-    setFirestoreDoc(this.db, `players/${player.id}`, player);
+    setFirestoreDoc(this.db, `games/${gameId}/players/${player.id}`, player);
     return player;
   }
 
