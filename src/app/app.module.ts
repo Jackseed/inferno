@@ -11,9 +11,13 @@ import { AppComponent } from './app.component';
 import { CanvasComponent } from './canvas/canvas.component';
 import { LoginComponent } from './auth/login/login.component';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { FormComponent } from './games/form/form.component';
+import { ViewComponent } from './games/view/view.component';
+import { ListComponent } from './games/list/list.component';
+import { MenuComponent } from './games/menu/menu.component';
 
 @NgModule({
-  declarations: [AppComponent, CanvasComponent, LoginComponent],
+  declarations: [AppComponent, CanvasComponent, LoginComponent, FormComponent, ViewComponent, ListComponent, MenuComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
