@@ -1,1 +1,3 @@
-<p>list works!</p>
+<li *ngFor="let game of gameList$ | async">
+  <button>{{ game.name }}</button>
+</li>
