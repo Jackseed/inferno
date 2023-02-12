@@ -19,7 +19,7 @@ export class GameService {
 
   public async updateGame(
     gameId: string,
-    updatedValues: Partial<Game> | FieldValue
+    updatedValues: Partial<Game> | { playerIds: FieldValue }
   ) {
     updateFirestoreDoc(this.db, `games/${gameId}`, updatedValues);
   }

@@ -34,7 +34,7 @@ export class FormComponent implements OnInit {
     this.service
       .addGame(this.gameName, userId)
       .then(async (gameId: string) => {
-        await this.playerService.setPlayer(gameId, userId);
+        await this.playerService.setPlayer(gameId, userId, 'blue');
         this.router.navigate(['games', gameId]);
       })
       .catch((error: any) => console.log('Game creation failed: ', error));

@@ -36,7 +36,6 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   public playerWidthAndHeight = 20;
   public playerX = 300;
   public playerY = 200;
-  public playerColor = 'orange';
   public velocity = 0;
 
   public controllerIndex = 0;
@@ -255,7 +254,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     const players = this.playerQuery.getAll();
     for (const player of players) {
       if (!!!player) return;
-      this.ctx.fillStyle = this.playerColor;
+      this.ctx.fillStyle = player.color;
       this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.beginPath();
       this.ctx.arc(
@@ -265,9 +264,9 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
         0,
         Math.PI * 2
       );
-      this.ctx.strokeStyle = this.playerColor;
+      this.ctx.strokeStyle = player.color;
       this.ctx.stroke();
-      this.ctx.fillStyle = this.playerColor;
+      this.ctx.fillStyle = player.color;
       this.ctx.fill();
       this.ctx.closePath();
     }

@@ -1,8 +1,7 @@
 // Angular
 import { Injectable } from '@angular/core';
 // Firebase
-import { Firestore } from '@angular/fire/firestore';
-import { arrayUnion } from 'firebase/firestore';
+import { Firestore, arrayUnion } from '@angular/fire/firestore';
 import {
   deleteFirestoreDoc,
   setFirestoreDoc,
@@ -22,17 +21,23 @@ export class PlayerService {
     private gameService: GameService
   ) {}
 
-  public async setPlayer(gameId: string, playerId: string): Promise<Player> {
-    const player = createPlayer(playerId, 'blue');
+  public async setPlayer(
+    gameId: string,
+    playerId: string,
+    color: string
+  ): Promise<Player> {
+    const player = createPlayer(playerId, color);
 
     setFirestoreDoc(this.db, `games/${gameId}/players/${player.id}`, player);
     return player;
   }
 
   public addPlayer(gameId: string, playerId: string) {
-    const playerIds = arrayUnion(playerId);
+    const playerIds = { playerIds: arrayUnion(playerId) };
     this.gameService.updateGame(gameId, playerIds);
-    this.setPlayer(gameId, playerId);
+    /*     const color = '#' + Math.floor(Math.random() * 8999999 + 100000).toString();
+    console.log(color); */
+    this.setPlayer(gameId, playerId, 'red');
   }
 
   public async updatePlayer(
