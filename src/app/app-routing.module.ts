@@ -50,6 +50,11 @@ const routes: Routes = [
     canActivate: [AuthGuard, SyncActiveGuard],
     data: { authGuardPipe: redirectUnauthorizedToLogin },
   },
+  {
+    path: '**',
+    redirectTo: '',
+    pathMatch: 'full',
+  },
 ];
 
 @NgModule({
