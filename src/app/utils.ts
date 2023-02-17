@@ -28,6 +28,63 @@ export interface KeyPressed {
   triangle: boolean;
 }
 
+export function addVectors(v1: Vector, v2: Vector) {
+  const sum = {
+    x: v1.x + v2.x,
+    y: v1.y + v2.y,
+  };
+  return sum;
+}
+
+export function multiplyVectors(k: number, v: Vector) {
+  const product = {
+    x: k * v.x,
+    y: k * v.y,
+  };
+  return product;
+}
+
+export function vectorOpposite(v: Vector) {
+  const opposite = {
+    x: -v.x,
+    y: -v.y,
+  };
+  return opposite;
+}
+
+export function normalizeVector(v: Vector) {
+  const length = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
+  const normalisedVect = {
+    x: v.x / length,
+    y: v.y / length,
+  };
+  return normalisedVect;
+}
+
+export function vectorLength(v: Vector) {
+  const length = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
+  return length
+}
+
+export function distanceToLine(
+  line: { startPoint: Vector; endPoint: Vector },
+  point: Vector
+) {
+  const lineToVector = addVectors(line.startPoint, vectorOpposite(line.endPoint))
+  const lineDirection = normalizeVector(lineToVector)
+  const lineLength = vectorLength(lineToVector)
+  let distances:number[] = []
+  for(let i=0; i<= lineLength/5; i++) {
+    const checkPoint = addVectors(line.startPoint,multiplyVectors(i,lineDirection))
+    const distanceFromPointToCheckPoint = vectorLength(addVectors(checkPoint, vectorOpposite(point)))
+    distances.push(distanceFromPointToCheckPoint)
+  }
+  const shortestDistance = Math.min(...distances)
+
+  return shortestDistance
+  
+}
+
 export function syncCollection<T>(
   db: Firestore,
   collectionName: string,
