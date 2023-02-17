@@ -69,7 +69,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   public leftShieldPosition = { x: 0, y: 0 };
   public rightShieldPosition = { x: 0, y: 0 };
   public shieldDirection = { x: -1, y: 0 };
-  public shieldLength = 70;
+  public shieldLength = 60;
   public orthVect: { x: number; y: number } = { x: 0, y: 0 };
 
   // Arc
@@ -143,28 +143,31 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private drawShield() {
+    const activePlayer = this.playerQuery.getActive();
     if (this.shieldUp) {
-      this.shieldDirection = this.direction;
+      this.shieldDirection = activePlayer.direction;
       this.orthVect = {
-        x: this.direction.y,
-        y: -this.direction.x,
+        x: this.shieldDirection.y,
+        y: -this.shieldDirection.x,
       };
     } else {
       this.shieldDirection = {
-        x: +this.direction.y,
-        y: -this.direction.x,
+        x: +activePlayer.direction.y,
+        y: -activePlayer.direction.x,
       };
       this.orthVect = {
-        x: -this.direction.x,
-        y: -this.direction.y,
+        x: -activePlayer.direction.x,
+        y: -activePlayer.direction.y,
       };
     }
 
     this.shieldCenterPosition = {
       x:
-        this.playerX + this.shieldDirection.x * 1.5 * this.playerWidthAndHeight,
+        activePlayer.position.x +
+        this.shieldDirection.x * 1.5 * this.playerWidthAndHeight,
       y:
-        this.playerY + this.shieldDirection.y * 1.5 * this.playerWidthAndHeight,
+        activePlayer.position.y +
+        this.shieldDirection.y * 1.5 * this.playerWidthAndHeight,
     };
     this.leftShieldPosition = {
       x:
@@ -179,6 +182,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
       y:
         this.shieldCenterPosition.y - this.orthVect.y * this.shieldLength * 0.4,
     };
+   
 
     this.ctx.beginPath();
     this.ctx.lineWidth = 10;
