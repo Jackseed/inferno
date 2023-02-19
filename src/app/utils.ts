@@ -63,27 +63,47 @@ export function normalizeVector(v: Vector) {
 
 export function vectorLength(v: Vector) {
   const length = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
-  return length
+  return length;
 }
 
 export function distanceToLine(
-  line: { startPoint: Vector; endPoint: Vector },
-  point: Vector
+  point: Vector,
+  line: { startPoint: Vector; endPoint: Vector }
 ) {
-  const lineToVector = addVectors(line.startPoint, vectorOpposite(line.endPoint))
-  const lineDirection = normalizeVector(lineToVector)
-  const lineLength = vectorLength(lineToVector)
-  let distances:number[] = []
-  for(let i=0; i<= lineLength/5; i++) {
-    const checkPoint = addVectors(line.startPoint,multiplyVectors(i,lineDirection))
-    const distanceFromPointToCheckPoint = vectorLength(addVectors(checkPoint, vectorOpposite(point)))
-    distances.push(distanceFromPointToCheckPoint)
+  const lineToVector = addVectors(
+    line.startPoint,
+    vectorOpposite(line.endPoint)
+  );
+  const lineDirection = normalizeVector(lineToVector);
+  const lineLength = vectorLength(lineToVector);
+  let distances: number[] = [];
+  for (let i = 0; i <= lineLength / 5; i++) {
+    const checkPoint = addVectors(
+      line.startPoint,
+      multiplyVectors(i, lineDirection)
+    );
+    const distanceFromPointToCheckPoint = vectorLength(
+      addVectors(checkPoint, vectorOpposite(point))
+    );
+    distances.push(distanceFromPointToCheckPoint);
   }
-  const shortestDistance = Math.min(...distances)
+  const shortestDistance = Math.min(...distances);
 
-  return shortestDistance
-  
+  return shortestDistance;
 }
+
+export function isColliding(
+  point: Vector,
+  line: {
+    startPoint: Vector;
+    endPoint: Vector;
+  }
+) {
+  if (distanceToLine(point, line) <= 5) return true;
+  else return false;
+}
+
+
 
 export function syncCollection<T>(
   db: Firestore,
